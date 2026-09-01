@@ -73,7 +73,7 @@ public class AppointmentsController : PatientBaseController
                 Doctor     = a.Doctor?.FullName,
                 Status     = a.Status.ToString(),
                 Notes      = a.Notes,
-                Source     = "Scheduled Appointment",
+                Source     = "Booked by the hospital",
                 SourceType = "scheduled",
                 Subject = $"Hospital Appointment - {a.Department?.Name ?? "General"}"
             })
@@ -81,12 +81,12 @@ public class AppointmentsController : PatientBaseController
             {
                 SourceId = r.Id,
                 BookingStatusId = r.Id,
-                Date       = CombineDateAndTime(r.PreferredDate, r.PreferredTime),
+                Date       = PortalAppointmentTime.Combine(r.PreferredDate, r.PreferredTime),
                 Department = r.Department?.Name ?? "—",
                 Doctor     = r.Doctor?.FullName,
                 Status     = r.Status.ToString(),
                 Notes      = r.Message,
-                Source     = "Booking Request",
+                Source     = "You asked for this",
                 SourceType = "request",
                 Subject = $"Hospital Appointment Request - {r.Department?.Name ?? "General"}"
             }))
@@ -139,7 +139,7 @@ public class AppointmentsController : PatientBaseController
             if (request is null)
                 return NotFound();
 
-            var requestStart = CombineDateAndTime(request.PreferredDate, request.PreferredTime);
+            var requestStart = PortalAppointmentTime.Combine(request.PreferredDate, request.PreferredTime);
             if (requestStart <= DateTime.Now || request.Status != AppointmentStatus.Approved)
             {
                 return BadRequest("Only approved upcoming appointments can be added to a calendar.");
@@ -307,13 +307,4 @@ public class AppointmentsController : PatientBaseController
             ? "Cancelled by patient."
             : $"{notes} [CANCELLED BY PATIENT]";
 
-    private static DateTime CombineDateAndTime(DateTime date, string? time)
-    {
-        if (!string.IsNullOrWhiteSpace(time) && DateTime.TryParse(time, out var parsedTime))
-        {
-            return date.Date.Add(parsedTime.TimeOfDay);
-        }
-
-        return date.Date;
-    }
 }

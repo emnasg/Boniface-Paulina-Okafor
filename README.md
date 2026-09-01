@@ -2,7 +2,7 @@
 
 An ASP.NET Core MVC hospital management website with a public-facing site, admin panel, and patient document portal.
 
-Project learning notes and interview-ready explanations are maintained in [`docs/STUDENT_STUDY_NOTES.md`](docs/STUDENT_STUDY_NOTES.md). The current source-backed hosting decision is in [`docs/FREE_HOSTING_READINESS.md`](docs/FREE_HOSTING_READINESS.md).
+The current source-backed hosting decision is in [`DEPLOYMENT.md`](DEPLOYMENT.md).
 The production-fidelity browser strategy and commands are in [`docs/E2E_TESTING.md`](docs/E2E_TESTING.md).
 
 Primary hospital identity used by the public site:
@@ -19,7 +19,7 @@ Primary hospital identity used by the public site:
 - **Database**: PostgreSQL 16 (Supabase when hosted)
 - **ORM**: Entity Framework Core (code-first migrations)
 - **Auth**: ASP.NET Core Identity with roles (`Admin`, `Staff`, `Patient`)
-- **Frontend**: Razor Views — compiled Tailwind CSS utilities (public), Bootstrap 5 (admin/patient), Alpine.js interactions
+- **Frontend**: Razor Views — compiled Tailwind CSS utilities (public), Bootstrap 5 (admin/patient), Alpine.js interactions. The public landing page (`Views/Home/Index.cshtml`) mounts a React tree (`client/landing/`, built by Vite to `wwwroot/js/landing.js`) into a server-rendered shell — see [`docs/LANDING_PAGE_HANDOFF.md`](docs/LANDING_PAGE_HANDOFF.md) and [`docs/decisions/0006-react-landing-page-non-headless.md`](docs/decisions/0006-react-landing-page-non-headless.md).
 
 ---
 
@@ -64,11 +64,11 @@ $HOME/.dotnet/dotnet run --launch-profile demo
 
 The demo profile runs at `http://localhost:5187` without PostgreSQL and uses clearly labelled mock payments; it never collects real money.
 
-- To build frontend CSS (Tailwind):
+- To build frontend assets (Tailwind CSS and the React landing page):
 
 ```bash
 npm install
-npm run build:css
+npm run build
 ```
 
 - Fedora users can install Node/npm with:
@@ -124,29 +124,36 @@ The application will be available at `https://localhost:5001` (or the port shown
 
 ## Frontend Assets
 
-The public site uses Tailwind CSS from a local compiled stylesheet, not the Tailwind CDN.
+The public site uses Tailwind CSS from a local compiled stylesheet, not the Tailwind CDN. The
+public landing page (`Views/Home/Index.cshtml`) is a React tree built from `client/landing/`
+— see [`docs/LANDING_PAGE_HANDOFF.md`](docs/LANDING_PAGE_HANDOFF.md).
 
-Build the stylesheet after changing Razor utility classes or `wwwroot/css/tailwind.input.css`:
+Build both after changing Razor utility classes, `wwwroot/css/tailwind.input.css`, or anything
+under `client/landing/`:
 
 ```bash
 npm install
-npm run build:css
+npm run build
 ```
 
-During active UI work you can use:
+During active UI work you can run either watcher on its own:
 
 ```bash
-npm run watch:css
+npm run watch:css       # rebuilds wwwroot/css/tailwind.css on change
+npm run watch:landing   # rebuilds wwwroot/js/landing.js on change
 ```
 
-The generated file is `wwwroot/css/tailwind.css`, which is referenced by `Views/Shared/_Layout.cshtml`.
+`npm run build:css` writes `wwwroot/css/tailwind.css` (referenced by `Views/Shared/_Layout.cshtml`).
+`npm run build:landing` writes `wwwroot/js/landing.js` (referenced by `Views/Home/Index.cshtml`).
+Both outputs are committed, the same way `tailwind.css` always has been — there is no build step
+in CI or at deploy time, so re-run this after editing either source and commit the result.
 
 ---
 
 ## Collaboration Docs
 
 - [`docs/COLLABORATION_WORKFLOW.md`](docs/COLLABORATION_WORKFLOW.md) explains backend/frontend ownership boundaries.
-- [`FRONTEND_BACKEND_INTEGRATION_CONTRACT.md`](FRONTEND_BACKEND_INTEGRATION_CONTRACT.md) describes the frontend/backend handoff contract.
+- [`docs/LANDING_PAGE_HANDOFF.md`](docs/LANDING_PAGE_HANDOFF.md) describes the current frontend/backend handoff for the homepage redesign.
 - [`docs/FUNCTIONALITY_RECOVERY_PLAN.md`](docs/FUNCTIONALITY_RECOVERY_PLAN.md) defines the backend recovery phases and completion rules.
 - [`docs/FUNCTIONALITY_LOOP.md`](docs/FUNCTIONALITY_LOOP.md) defines the repeatable Codex improvement loop.
 - [`docs/FUNCTIONALITY_LOOP_BOARD.md`](docs/FUNCTIONALITY_LOOP_BOARD.md) separates Codex-lane work from owner-only tasks.
@@ -157,9 +164,6 @@ The generated file is `wwwroot/css/tailwind.css`, which is referenced by `Views/
 - [`docs/RECOVERY_STATUS.md`](docs/RECOVERY_STATUS.md) records the latest verified local result.
 - [`DEPLOYMENT.md`](DEPLOYMENT.md) defines the active Supabase/Render release,
   migration, verification, and rollback process.
-- [`docs/BACKUP_RESTORE_RUNBOOK.md`](docs/BACKUP_RESTORE_RUNBOOK.md) is the legacy
-  Azure recovery design; confirm a Supabase-specific recovery drill before using
-  the hosted system for real patient data.
 - [`docs/ENVIRONMENT_VARIABLES.md`](docs/ENVIRONMENT_VARIABLES.md) lists local and provider configuration keys.
 - [`docs/LOCAL_WINDOWS_SETUP.md`](docs/LOCAL_WINDOWS_SETUP.md) gives Windows-specific clone/build/run steps.
 - Architecture decision records live in [`docs/decisions`](docs/decisions).

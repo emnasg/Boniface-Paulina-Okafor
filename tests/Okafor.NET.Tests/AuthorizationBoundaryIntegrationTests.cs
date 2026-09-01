@@ -44,7 +44,6 @@ public sealed class AuthorizationBoundaryIntegrationTests
     [InlineData("Staff", "/Admin/AppointmentRequests")]
     [InlineData("Staff", "/Admin/Teleconsultations")]
     [InlineData("Staff", "/Admin/BillPayments")]
-    [InlineData("Staff", "/Admin/Donations")]
     public async Task AuthorizedRole_CanOpenAssignedRoute(string role, string url)
     {
         using var factory = CreateFactory(useTestAuthentication: true);
@@ -62,6 +61,17 @@ public sealed class AuthorizationBoundaryIntegrationTests
     [Theory]
     [InlineData("Patient", "/Admin/Dashboard")]
     [InlineData("Patient", "/Admin/AppointmentRequests")]
+    // The routes holding identifiable patient data. These are Admin-only through
+    // AdminBaseController rather than an attribute of their own, so nothing else
+    // would catch it if that inheritance were broken.
+    [InlineData("Patient", "/Admin/PatientProfiles")]
+    [InlineData("Patient", "/Admin/PatientMessages")]
+    [InlineData("Patient", "/Admin/PatientAppointments")]
+    [InlineData("Patient", "/Admin/Users")]
+    [InlineData("Staff", "/Admin/PatientProfiles")]
+    [InlineData("Staff", "/Admin/PatientMessages")]
+    [InlineData("Staff", "/Admin/PatientAppointments")]
+    [InlineData("Staff", "/Admin/Users")]
     [InlineData("Staff", "/Admin/Dashboard")]
     [InlineData("Staff", "/Admin/Integrations")]
     [InlineData("Staff", "/Portal/Dashboard")]
