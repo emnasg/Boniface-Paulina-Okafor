@@ -12,15 +12,26 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: "wwwroot/js",
+    outDir: 'wwwroot/js',
     emptyOutDir: false,
     sourcemap: false,
     rollupOptions: {
-      input: fileURLToPath(new URL("./client/landing/main.jsx", import.meta.url)),
+      input: {
+        home: fileURLToPath(
+          new URL('./client/marketing/pages/home/main.jsx', import.meta.url),
+        ),
+        services: fileURLToPath(
+          new URL(
+            './client/marketing/pages/services/main.jsx',
+            import.meta.url,
+          ),
+        ),
+        contact: fileURLToPath(
+          new URL('./client/marketing/pages/contact/main.jsx', import.meta.url),
+        ),
+      },
       output: {
-        entryFileNames: "landing.js",
-        chunkFileNames: "landing-[name].js",
-        assetFileNames: "landing-[name][extname]",
+        entryFileNames: 'marketing-[name].js',
       },
     },
   },

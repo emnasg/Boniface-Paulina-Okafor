@@ -6,8 +6,8 @@
     "build": "npm run build:css && npm run build:landing",
     "build:css": "tailwindcss -i wwwroot/css/tailwind.input.css -o wwwroot/css/tailwind.css --minify",
     "watch:css": "tailwindcss -i wwwroot/css/tailwind.input.css -o wwwroot/css/tailwind.css --watch",
-    "build:landing": "vite build",
-    "watch:landing": "vite build --watch"
+    "build:marketing": "vite build",
+    "watch:marketing": "vite build --watch"
   },
   "dependencies": {
     "react": "19.2.8",
